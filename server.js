@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const db = require("./db/todos");
+const dbu = require("./db/users");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -28,5 +29,20 @@ app.delete("/todos/:id", async(req, res) => {
     res.status(200).json({success: true});
 });
 
+app.post("/todos", async(req, res) => {
+    const results = await db.createTodo(req.body);
+    res.status(201).json({id: results [0]});
+});
+
+
+app.post("/users", async(req, res) => {
+    const results = await dbu.createUser(req.body);
+    res.status(201).json({id: results [0]});
+});
+
+app.get("/users", async(req, res) => {
+    const users = await dbu.getAllUsers();
+    res.status(200).json({users});
+});
 
 app.listen(3000, () => console.log("server is runnig on port 3000"));
