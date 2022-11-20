@@ -5,7 +5,7 @@ function createUser(user) {
 }
 
 function registerUser(user) {
-    return knex("users").first("*");
+    return knex("users").first("*").where("username", user).select();
 }
 
 function getAllUsers(user) {

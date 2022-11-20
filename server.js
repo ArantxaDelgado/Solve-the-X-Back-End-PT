@@ -47,27 +47,33 @@ app.post("/register", async(req, res) => {
     } catch(e) {
         console.log(e);
         res.status(500).send();
-    }
+    }    
 });
 
 app.post("/login", async(req, res) => {
     try {
         let {username, password} = req.body;
-        const user = await dbu.registerUser.where({username: username});
-
+        const user = await dbu.registerUser(username);
         if(user) {
-            const validPass = await bcrypt.compare(password, user.hash)
-            if(validPass) {
-                res.status(200).json("valid username and password")
+            const validPassword = await bcrypt.compare(password, user.password);
+            if(validPassword) {
+                res.status(200).json("Valid username and password.");
+            } else{
+                res.json("Wrong password.");
             }
+        }   else {
+            res.status(404).json("User not found.");
         }
     } catch(e) {
         console.log(e);
         res.status(500).send();
-    }
+    }    
 });
 
-
+app.get("/users", async(req, res) => {
+    const users = await dbu.getAllUsers();
+    res.status(200).json({users});
+});
 
 
 
