@@ -3,6 +3,8 @@ const app = express();
 const bodyParser = require("body-parser");
 const db = require("./db/todos");
 const dbu = require("./db/users");
+const bcrypt = require("bcrypt");
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -35,14 +37,38 @@ app.post("/todos", async(req, res) => {
 });
 
 
-app.post("/users", async(req, res) => {
-    const results = await dbu.createUser(req.body);
-    res.status(201).json({id: results [0]});
+app.post("/register", async(req, res) => {
+    try {
+        let {username, password} = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        password = hashedPassword;
+        const results = await dbu.createUser({username, password});
+        res.status(201).json({id: results [0]});
+    } catch(e) {
+        console.log(e);
+        res.status(500).send();
+    }
 });
 
-app.get("/users", async(req, res) => {
-    const users = await dbu.getAllUsers();
-    res.status(200).json({users});
+app.post("/login", async(req, res) => {
+    try {
+        let {username, password} = req.body;
+        const user = await dbu.registerUser.where({username: username});
+
+        if(user) {
+            const validPass = await bcrypt.compare(password, user.hash)
+            if(validPass) {
+                res.status(200).json("valid username and password")
+            }
+        }
+    } catch(e) {
+        console.log(e);
+        res.status(500).send();
+    }
 });
+
+
+
+
 
 app.listen(3000, () => console.log("server is runnig on port 3000"));

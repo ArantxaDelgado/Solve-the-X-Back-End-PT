@@ -4,6 +4,10 @@ function createUser(user) {
     return knex("users").insert(user);
 }
 
+function registerUser(user) {
+    return knex("users").first("*");
+}
+
 function getAllUsers(user) {
     return knex("users").select("*");
 }
@@ -18,6 +22,7 @@ function updateUser(id, user) {
 
 module.exports = {
     createUser,
+    registerUser,
     getAllUsers,
     deleteUser,
     updateUser
